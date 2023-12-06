@@ -1,1 +1,1 @@
-# rust-calculator
+# time-calculator

@@ -2,13 +2,13 @@ use std::fmt::{self, Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Debug, Clone)]
-struct Mytime {
+struct Time {
     hour: usize,
     minute: usize,
     second: usize,
 }
 
-impl Mytime {
+impl Time {
     fn total_seconds(&self) -> usize {
         self.hour * 3600 + self.minute * 60 + self.second
     }
@@ -20,22 +20,22 @@ impl Mytime {
     }
 }
 
-impl PartialEq for Mytime {
+impl PartialEq for Time {
     fn eq(&self, other: &Self) -> bool {
         self.total_seconds() == other.total_seconds()
     }
 }
 
-impl Display for Mytime {
+impl Display for Time {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "{:02}:{:02}:{:02}", self.hour, self.minute, self.second)
     }
 }
 
-impl Add for Mytime {
+impl Add for Time {
     type Output = Self;
-    fn add(self, other: Self) -> Mytime {
-        let mut output: Mytime = Mytime {
+    fn add(self, other: Self) -> Time {
+        let mut output: Time = Time {
             hour: 0,
             minute: 0,
             second: self.total_seconds() + other.total_seconds(),
@@ -45,27 +45,27 @@ impl Add for Mytime {
     }
 }
 
-impl AddAssign for Mytime {
+impl AddAssign for Time {
     fn add_assign(&mut self, other: Self) {
         self.second += other.total_seconds();
         self.normalize();
     }
 }
 
-impl Sub for Mytime {
+impl Sub for Time {
     type Output = Self;
-    fn sub(self, other: Self) -> Mytime {
+    fn sub(self, other: Self) -> Time {
         let s = self.total_seconds();
         let o = other.total_seconds();
-        let mut output: Mytime;
+        let mut output: Time;
         if s >= o {
-            output = Mytime {
+            output = Time {
                 hour: 0,
                 minute: 0,
                 second: s - o,
             };
         } else {
-            output = Mytime {
+            output = Time {
                 hour: 0,
                 minute: 0,
                 second: o - s,
@@ -76,7 +76,7 @@ impl Sub for Mytime {
     }
 }
 
-impl SubAssign for Mytime {
+impl SubAssign for Time {
     fn sub_assign(&mut self, other: Self) {
         let s = self.total_seconds();
         let o = other.total_seconds();
@@ -93,10 +93,10 @@ impl SubAssign for Mytime {
     }
 }
 
-impl Mul<usize> for Mytime {
+impl Mul<usize> for Time {
     type Output = Self;
     fn mul(self, int: usize) -> Self {
-        let mut output: Mytime = Mytime {
+        let mut output: Time = Time {
             hour: 0,
             minute: 0,
             second: self.total_seconds() * int,
@@ -106,7 +106,7 @@ impl Mul<usize> for Mytime {
     }
 }
 
-impl MulAssign<usize> for Mytime {
+impl MulAssign<usize> for Time {
     fn mul_assign(&mut self, other: usize) {
         self.hour *= other;
         self.minute *= other;
@@ -115,13 +115,13 @@ impl MulAssign<usize> for Mytime {
     }
 }
 
-impl Div<usize> for Mytime {
+impl Div<usize> for Time {
     type Output = Self;
     fn div(self, other: usize) -> Self {
         if other == 0 {
-            panic!("Cannot divide by zero-valued `Mytime`!");
+            panic!("Cannot divide by zero-valued `Time`!");
         }
-        let mut output: Mytime = Mytime {
+        let mut output: Time = Time {
             hour: 0,
             minute: 0,
             second: self.total_seconds() / other,
@@ -131,17 +131,17 @@ impl Div<usize> for Mytime {
     }
 }
 
-impl Div for Mytime {
+impl Div for Time {
     type Output = f32;
     fn div(self, other: Self) -> Self::Output {
         self.total_seconds() as f32 / other.total_seconds() as f32
     }
 }
 
-impl DivAssign<usize> for Mytime {
+impl DivAssign<usize> for Time {
     fn div_assign(&mut self, other: usize) {
         if other == 0 {
-            panic!("Cannot divide by zero-valued `Mytime`!");
+            panic!("Cannot divide by zero-valued `Time`!");
         }
         let s = self.total_seconds();
         self.hour = 0;
@@ -153,17 +153,17 @@ impl DivAssign<usize> for Mytime {
 
 #[cfg(test)]
 mod tests {
-    use crate::Mytime;
+    use crate::Time;
     use rstest::*;
     #[fixture]
-    pub fn fixture() -> [Mytime; 2] {
+    pub fn fixture() -> [Time; 2] {
         [
-            Mytime {
+            Time {
                 hour: 1,
                 minute: 23,
                 second: 45,
             },
-            Mytime {
+            Time {
                 hour: 0,
                 minute: 0,
                 second: 0,
@@ -171,7 +171,7 @@ mod tests {
         ]
     }
     #[rstest]
-    fn test_init(fixture: [Mytime; 2]) {
+    fn test_init(fixture: [Time; 2]) {
         let a = &fixture[0];
         let b = &fixture[1];
         assert_eq!(a.hour, 1);
@@ -182,14 +182,14 @@ mod tests {
         assert_eq!(b.second, 0);
     }
     #[rstest]
-    fn test_total_seconds(fixture: [Mytime; 2]) {
+    fn test_total_seconds(fixture: [Time; 2]) {
         let a = &fixture[0];
         let b = &fixture[1];
         assert_eq!(a.total_seconds(), 3600 + 23 * 60 + 45);
         assert_eq!(b.total_seconds(), 0);
     }
     #[rstest]
-    fn test_eq(fixture: [Mytime; 2]) {
+    fn test_eq(fixture: [Time; 2]) {
         let a = fixture[0].clone();
         let mut b = fixture[1].clone();
         assert_ne!(a, b);
@@ -201,14 +201,14 @@ mod tests {
         assert_eq!(a, b);
     }
     #[rstest]
-    fn test_str(fixture: [Mytime; 2]) {
+    fn test_str(fixture: [Time; 2]) {
         let a = &fixture[0];
         let b = &fixture[1];
         assert_eq!(a.to_string(), "01:23:45".to_string());
         assert_eq!(b.to_string(), "00:00:00".to_string());
     }
     #[rstest]
-    fn test_normalize(fixture: [Mytime; 2]) {
+    fn test_normalize(fixture: [Time; 2]) {
         let a = fixture[0].clone();
         let mut b = fixture[1].clone();
         b.second = a.total_seconds();
@@ -219,7 +219,7 @@ mod tests {
         assert_eq!(b.to_string(), a.to_string());
     }
     #[rstest]
-    fn test_add(fixture: [Mytime; 2]) {
+    fn test_add(fixture: [Time; 2]) {
         let mut a = fixture[0].clone();
         let b = fixture[1].clone();
         let c = a.clone() + b.clone();
@@ -230,7 +230,7 @@ mod tests {
         assert_eq!(a, d);
     }
     #[rstest]
-    fn test_mul(fixture: [Mytime; 2]) {
+    fn test_mul(fixture: [Time; 2]) {
         let mut a = fixture[0].clone();
         let b = a.clone() * 2;
         assert_eq!(b.to_string(), "02:47:30");
@@ -240,7 +240,7 @@ mod tests {
         assert_eq!(a.to_string(), "02:47:30");
     }
     #[rstest]
-    fn test_sub(fixture: [Mytime; 2]) {
+    fn test_sub(fixture: [Time; 2]) {
         let mut a = fixture[0].clone();
         let mut b = fixture[1].clone();
         b.hour = 4;
@@ -256,7 +256,7 @@ mod tests {
         assert_eq!(a.to_string(), "01:12:30".to_string());
     }
     #[rstest]
-    fn test_div(fixture: [Mytime; 2]) {
+    fn test_div(fixture: [Time; 2]) {
         let mut a = fixture[0].clone();
         let mut b = fixture[1].clone();
         b.minute = 20;
@@ -271,7 +271,7 @@ mod tests {
     }
     #[rstest]
     #[should_panic]
-    fn test_panic(fixture: [Mytime; 2]) {
+    fn test_panic(fixture: [Time; 2]) {
         let _ = fixture[0].clone() / 0;
     }
 }
